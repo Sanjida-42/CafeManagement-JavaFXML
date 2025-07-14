@@ -1,4 +1,6 @@
 com\mycompany\cafe\shop\management\LoginController.class
-com\mycompany\cafe\shop\management\CafeShopMain.class
 com\mycompany\cafe\shop\management\SignupController.class
 module-info.class
+com\mycompany\cafe\shop\management\DBUtil.class
+com\mycompany\cafe\shop\management\CafeShopMain.class
+com\mycompany\cafe\shop\management\HomeController.class

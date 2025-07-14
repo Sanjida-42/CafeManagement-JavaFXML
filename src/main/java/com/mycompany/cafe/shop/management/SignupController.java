@@ -8,6 +8,9 @@ import javafx.scene.text.Text;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
 
 public class SignupController implements Initializable {
@@ -19,7 +22,7 @@ public class SignupController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        System.out.println("Login link loaded: " + loginLink);
+        DBUtil.initialize(); 
         loginLink.setOnMouseClicked((MouseEvent event) -> {
             try {
                 CafeShopMain.setRoot("login");
@@ -30,6 +33,37 @@ public class SignupController implements Initializable {
     }
 
     public void handleSignup() {
-        System.out.println("Signup: " + nameField.getText());
+        String name = nameField.getText().trim();
+        String email = emailField.getText().trim();
+        String password = passwordField.getText();
+
+        if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "All fields are required.");
+            return;
+        }
+
+        try (Connection conn = DBUtil.getConnection()) {
+            String sql = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, name);
+            ps.setString(2, email);
+            ps.setString(3, password);
+            ps.executeUpdate();
+            showAlert(Alert.AlertType.INFORMATION, "Signup successful. Please login.");
+            CafeShopMain.setRoot("login");
+        } catch (SQLException e) {
+            if (e.getMessage().contains("Duplicate entry")) {
+                showAlert(Alert.AlertType.ERROR, "Email already registered.");
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Signup failed: " + e.getMessage());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void showAlert(Alert.AlertType type, String msg) {
+        Alert alert = new Alert(type, msg, ButtonType.OK);
+        alert.showAndWait();
     }
 }
