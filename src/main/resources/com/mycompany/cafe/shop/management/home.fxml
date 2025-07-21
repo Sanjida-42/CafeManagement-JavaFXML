@@ -1,14 +1,146 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.net.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.collections.FXCollections?> <?import java.lang.String?> <BorderPane prefHeight="600.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.cafe.shop.management.HomeController">
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.cafe.shop.management.HomeController">
-    <stylesheets>
-        <URL value="@home.css"/>
-    </stylesheets>
-</AnchorPane>
+    <left>
+        <VBox alignment="TOP_CENTER" prefWidth="220" spacing="20" style="-fx-background-color: #373a47;" BorderPane.alignment="CENTER">
+            <Label style="-fx-font-size: 22px; -fx-font-weight: bold;" text="Cafe Shop" textFill="#fff" />
+            <Label text="Welcome," textFill="#fff" />
+            <Label fx:id="username" style="-fx-font-size: 14;" text="UserName" textFill="#eefbff" />
+            <Button fx:id="dashboard_btn" onAction="#switchForm" prefWidth="180" text="Dashboard" />
+            <Button fx:id="inventory_btn" onAction="#switchForm" prefWidth="180" text="Inventory" />
+            <Button fx:id="menu_btn" onAction="#switchForm" prefWidth="180" text="Menu" />
+            <Button fx:id="customers_btn" onAction="#switchForm" prefWidth="180" text="Customers" />
+            <Button fx:id="logout_btn" onAction="#logout" prefWidth="180" style="-fx-background-color: #b13e3e; -fx-text-fill: white;" text="Logout" />
+        </VBox>
+    </left>
+
+    <center>
+        <StackPane fx:id="centerStack" BorderPane.alignment="CENTER">
+
+            <AnchorPane fx:id="dashboard_form" prefHeight="600" prefWidth="650" visible="true">
+                <children>
+                    <Label layoutX="20" layoutY="20" style="-fx-font-size: 30px;" text="Dashboard" />
+                </children>
+            </AnchorPane>
+
+            <AnchorPane fx:id="inventory_form" prefHeight="600" prefWidth="650" visible="false">
+                <children>
+                    <VBox spacing="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                        <padding>
+                            <Insets bottom="10" left="10" right="10" top="10" />
+                        </padding>
+                        <TableView fx:id="inventory_tableView" prefHeight="220.0">
+                            <columns>
+                                <TableColumn fx:id="idCol" prefWidth="48" text="ID" />
+                                <TableColumn fx:id="nameCol" prefWidth="100" text="Name" />
+                                <TableColumn fx:id="typeCol" prefWidth="70" text="Type" />
+                                <TableColumn fx:id="stockCol" prefWidth="55" text="Stock" />
+                                <TableColumn fx:id="priceCol" prefWidth="65" text="Price" />
+                                <TableColumn fx:id="statusCol" prefWidth="80" text="Status" />
+                                <TableColumn fx:id="imagePathCol" prefWidth="120" text="Image Path" />
+                            </columns>
+                        </TableView>
+                        <Separator />
+                        <GridPane hgap="10" vgap="10">
+                            <Label text="ID:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                            <TextField fx:id="idField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                            <Label text="Name:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                            <TextField fx:id="nameField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                            <Label text="Type:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                            <TextField fx:id="typeField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                            <Label text="Stock:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                            <TextField fx:id="stockField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                            <Label text="Price:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                            <TextField fx:id="priceField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                            <Label text="Status:" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+                            <ComboBox fx:id="statusCombo" GridPane.rowIndex="5" GridPane.columnIndex="1">
+                                <items>
+                                    <FXCollections fx:factory="observableArrayList">
+                                        <String fx:value="Available"/>
+                                        <String fx:value="Not Available"/>
+                                    </FXCollections>
+                                </items>
+                            </ComboBox>
+              
+
+                            <Label text="Image:" GridPane.columnIndex="0" GridPane.rowIndex="7" />
+                            <HBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="7">
+                                <TextField fx:id="imagePathField" prefWidth="180" promptText="img path..." />
+                                <Button onAction="#chooseImage" text="Choose" />
+                            </HBox>
+                            <columnConstraints>
+                                <ColumnConstraints />
+                                <ColumnConstraints />
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints />
+                                <RowConstraints />
+                                <RowConstraints />
+                                <RowConstraints />
+                                <RowConstraints />
+                                <RowConstraints />
+                                <RowConstraints />
+                                <RowConstraints />
+                            </rowConstraints>
+                        </GridPane>
+                        <HBox spacing="12">
+                            <Button onAction="#addProduct" text="Add" />
+                            <Button onAction="#updateProduct" text="Update" />
+                            <Button onAction="#deleteProduct" text="Delete" />
+                            <Button onAction="#clearFields" text="Clear" />
+                        </HBox>
+                    </VBox>
+                </children>
+            </AnchorPane>
+
+            <AnchorPane fx:id="menu_form" prefHeight="600" prefWidth="1050" visible="false">
+                <children>
+                    <HBox spacing="16" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                        <ScrollPane fitToWidth="true" prefHeight="550" prefWidth="600">
+                            <content>
+                                <GridPane fx:id="menu_gridPane" hgap="20" vgap="20" />
+                            </content>
+                        </ScrollPane>
+                        <VBox alignment="TOP_RIGHT" prefWidth="340" spacing="12">
+                            <Label style="-fx-font-size:18; -fx-font-weight:bold;" text="Your Order" />
+                            <VBox fx:id="cartBox" spacing="6" />
+                            <Separator />
+                            <HBox alignment="CENTER_RIGHT" spacing="10">
+                                <Label style="-fx-font-size:16;" text="Total:" />
+                                <Label fx:id="cartTotalLabel" style="-fx-font-size:18; -fx-font-weight:bold;" text="\$0.0" />
+                            </HBox>
+                            <HBox alignment="CENTER_RIGHT" spacing="8">
+                                <Button fx:id="payBtn" onAction="#payOrder" style="-fx-font-size:16; -fx-background-color: #38ac74; -fx-text-fill:white;" text="Pay" />
+                                <Button fx:id="clearCartBtn" onAction="#clearCart" style="-fx-font-size:16;" text="Clear" />
+                            </HBox>
+                        </VBox>
+                    </HBox>
+                </children>
+            </AnchorPane>
+
+            <AnchorPane fx:id="customers_form" prefHeight="600" prefWidth="650" visible="false">
+                <children>
+                    <Label layoutX="20" layoutY="20" style="-fx-font-size: 30px;" text="Customers" />
+                </children>
+            </AnchorPane>
+        </StackPane>
+    </center>
+</BorderPane>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/20.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.mycompany.cafe.shop.management.DashboardController"
+            prefWidth="900" prefHeight="600">
+
+    <VBox spacing="18" AnchorPane.leftAnchor="18" AnchorPane.rightAnchor="18" AnchorPane.topAnchor="18">
+
+        <!-- Metrics Cards -->
+        <HBox spacing="30">
+            <VBox style="-fx-background-color: white; -fx-border-radius:7; -fx-background-radius:7; -fx-padding:14; -fx-effect:dropshadow(two-pass-box,#222,2,0.07,0,2);" alignment="CENTER">
+                <Label text="Products" style="-fx-font-size:14;"/>
+                <Label fx:id="productsCount" text="0" style="-fx-font-size:36; -fx-font-weight:bold;"/>
+            </VBox>
+            <VBox style="-fx-background-color: white; -fx-border-radius:7; -fx-background-radius:7; -fx-padding:14; -fx-effect:dropshadow(two-pass-box,#222,2,0.07,0,2);" alignment="CENTER">
+                <Label text="Orders" style="-fx-font-size:14;"/>
+                <Label fx:id="ordersCount" text="0" style="-fx-font-size:36; -fx-font-weight:bold;"/>
+            </VBox>
+            <VBox style="-fx-background-color: white; -fx-border-radius:7; -fx-background-radius:7; -fx-padding:14; -fx-effect:dropshadow(two-pass-box,#222,2,0.07,0,2);" alignment="CENTER">
+                <Label text="Revenue" style="-fx-font-size:14;"/>
+                <Label fx:id="revenueLabel" text="\$0.00" style="-fx-font-size:36; -fx-font-weight:bold;"/>
+            </VBox>
+            <VBox style="-fx-background-color: white; -fx-border-radius:7; -fx-background-radius:7; -fx-padding:14; -fx-effect:dropshadow(two-pass-box,#222,2,0.07,0,2);" alignment="CENTER">
+                <Label text="Users" style="-fx-font-size:14;"/>
+                <Label fx:id="usersCount" text="0" style="-fx-font-size:36; -fx-font-weight:bold;"/>
+            </VBox>
+        </HBox>
+
+        <!-- Recent Orders -->
+        <Label text="Recent Orders:" style="-fx-font-size:18; -fx-padding:12 0 0 0;"/>
+        <TableView fx:id="ordersTable" prefHeight="150">
+            <columns>
+                <TableColumn fx:id="orderIdCol" text="Order ID" prefWidth="70"/>
+                <TableColumn fx:id="orderUserCol" text="User" prefWidth="120"/>
+                <TableColumn fx:id="orderDateCol" text="Ordered At" prefWidth="170"/>
+                <TableColumn fx:id="orderTotalCol" text="Total" prefWidth="90"/>
+            </columns>
+        </TableView>
+
+        <!-- Low stock products -->
+        <Label text="Low Stock Products:" style="-fx-font-size:18; -fx-padding:12 0 0 0;"/>
+        <TableView fx:id="lowStockTable" prefHeight="100">
+            <columns>
+                <TableColumn fx:id="lsProductCol" text="Product" prefWidth="180"/>
+                <TableColumn fx:id="lsStockCol" text="Stock Left" prefWidth="100"/>
+            </columns>
+        </TableView>
+    </VBox>
+</AnchorPane>

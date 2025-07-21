@@ -1,28 +1,24 @@
 package com.mycompany.cafe.shop.management;
 
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
 
 import java.io.IOException;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.ResourceBundle;
 
-public class LoginController implements Initializable {
-
+public class LoginController {
+     public static String currentUserName = null; 
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
     @FXML private Text signUpLink;
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        DBUtil.initialize(); // Ensure DB/table exists
-        signUpLink.setOnMouseClicked((MouseEvent event) -> {
+    @FXML
+    public void initialize() {
+        DBUtil.initialize();
+        signUpLink.setOnMouseClicked(event -> {
             try {
                 CafeShopMain.setRoot("signup");
             } catch (IOException e) {
@@ -36,28 +32,33 @@ public class LoginController implements Initializable {
         String password = passwordField.getText();
 
         if (email.isEmpty() || password.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Please enter email and password.");
+            alert("Login Failed", "Please enter both email and password.", Alert.AlertType.WARNING);
             return;
         }
 
         try (Connection conn = DBUtil.getConnection()) {
-            String sql = "SELECT * FROM users WHERE email = ? AND password = ?";
-            PreparedStatement ps = conn.prepareStatement(sql);
+            PreparedStatement ps = conn.prepareStatement(
+                "SELECT * FROM users WHERE email=? AND password=?"
+            );
             ps.setString(1, email);
             ps.setString(2, password);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
+                currentUserName = rs.getString("name");
                 CafeShopMain.setRoot("home");
             } else {
-                showAlert(Alert.AlertType.ERROR, "No account found or wrong password.");
+                alert("Login Failed", "Invalid email or password.", Alert.AlertType.ERROR);
             }
         } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Login failed: " + e.getMessage());
+             e.printStackTrace();
+            alert("Database Error", e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
-    private void showAlert(Alert.AlertType type, String msg) {
-        Alert alert = new Alert(type, msg, ButtonType.OK);
+    private void alert(String title, String message, Alert.AlertType type) {
+        Alert alert = new Alert(type);
+        alert.setHeaderText(title);
+        alert.setContentText(message);
         alert.showAndWait();
     }
 }
