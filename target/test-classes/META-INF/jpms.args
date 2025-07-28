@@ -1,0 +1,4 @@
+--patch-module
+com.mycompany.cafe.shop.management=_
+--add-reads
+com.mycompany.cafe.shop.management=ALL-UNNAMED
