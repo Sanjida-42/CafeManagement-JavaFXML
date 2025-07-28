@@ -200,7 +200,9 @@ public class DashboardController implements Initializable {
                 "ORDER BY o.ordered_at DESC LIMIT 10"
             );
             while (rs.next()) {
-                double originalTotal = rs.getDouble("original_total");
+          
+                double originalTotal = Math.round(rs.getDouble("original_total") * 10.0) / 10.0; 
+                
                 double finalTotal = rs.getDouble("total");
                 double savings = Math.round(rs.getDouble("savings") * 10.0) / 10.0; 
                 

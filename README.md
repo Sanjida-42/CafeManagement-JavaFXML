@@ -1,38 +1,50 @@
 # Café Shop Management System
 
-A robust desktop application designed to streamline café operations, offering comprehensive features for customer registration, inventory tracking, and product management. Built with **JavaFXML**, this system provides a modern, responsive, and user-friendly interface to enhance daily café workflows.
+A simple desktop app built with JavaFX to help small cafés manage their daily work. It includes easy sign-up/login, product tracking, ordering with carts, coupons for discounts, and a dashboard to see important stats like sales and stock levels.
 
----
 
 ## Features
 
-* **User Authentication:** Secure login and sign-up functionality to protect system access and data.
-* **Dashboard Overview:** A clean and intuitive dashboard displaying key metrics such as total customers, daily income, and other vital operational insights.
-* **Product Management:** Seamlessly add, update, or delete products with customizable details including ID, name, price, and availability status.
-* **Inventory Tracking:** Efficiently monitor stock levels and manage inventory to prevent shortages and optimize ordering.
-* **Menu Management:** Easily organize and update the café's menu items, ensuring accurate and up-to-date offerings.
-* **Customer Management:** Register and track comprehensive customer information, enabling personalized service and improved customer relations.
-* **User-Friendly Interface:** Developed with JavaFX to provide a responsive, modern, and intuitive graphical user interface.
-
----
+- **User Sign-Up and Login**: Create an account or log in securely to use the app.
+- **Dashboard**: Shows quick stats like number of products, total orders, revenue, coupons used, total savings from discounts, and low-stock items.
+- **Inventory Management**: Add, update, or delete products with details like name, type, stock, price, status (available/not available), and image.
+- **Menu and Ordering**: Browse products as cards, add to cart, apply coupons for discounts (e.g., 10% off), and place orders with automatic stock updates.
+- **Coupon System**: Get a new coupon code after each order (e.g., "CAFE10-XYZ123" for 10% off next time). Apply codes during checkout to save money.
+- **Customer Management**: View customer details like name, email, order count, and total spent.
+- **Easy Interface**: Clean design with alerts for success or errors, making it simple for café staff to use.
 
 ## Technologies Used
 
-* **Java Development Kit (JDK):** Version 24
-* **JavaFX SDK**
-* **JavaFXML** 
-* **Java IDE:** (Netbeans, Scene-builder(fxml))
-
----
+- **Java Development Kit (JDK)**: Version 24 (for running the app).
+- **JavaFX SDK**: For building the user interface.
+- **FXML**: For designing screens (used with Scene Builder).
+- **MySQL Database**: For storing data like users, products, orders, and coupons.
+- **IDE**: NetBeans (for coding) and Scene Builder (for UI design).
 
 ## Setup
 
-need **JDK 24** and the **JavaFX SDK** installed.
+1. **Install JDK 24**: Download from [Oracle's website](https://www.oracle.com/java/technologies/downloads/).
+2. **Install JavaFX SDK**: Download from [Gluon](https://gluonhq.com/products/javafx/) and add it to your project.
+3. **Set Up MySQL**: Install MySQL (free from [MySQL site](https://dev.mysql.com/downloads/)). Create a database named "cafe-shop" (the app will make tables automatically).
+4. **Open in NetBeans**: Import the project folder, add JavaFX libraries, and run the main class (CafeShopMain.java).
 
----
+Run the app—it connects to the local database and starts!
 
 ## Usage
 
-The Café Shop Management System offers an intuitive interface for café staff to manage daily operations efficiently. Upon launching the application, users can log in or sign up to gain access to the main dashboard and various management features, including product, inventory, menu, and customer management.
+1. **Start the App**: Run it from NetBeans. You'll see the login screen.
+2. **Sign Up or Log In**: New users sign up with name, email, password. Existing users log in.
+3. **Navigate Sections**:
+   - **Dashboard**: View stats like revenue and low stock.
+   - **Inventory**: Add/edit products.
+   - **Menu**: Browse items, add to cart, apply coupon, pay.
+   - **Customers**: See customer info.
+4. **Place an Order**: In Menu, add items, enter coupon if you have one, click Pay—stock updates, and a new coupon is generated.
+5. **Logout**: From the sidebar to end session.
 
----
+The app shows alerts for actions like "Order successful!" or errors. It's designed to be easy for café owners and staff. 
+
+
+--- 
+
+
