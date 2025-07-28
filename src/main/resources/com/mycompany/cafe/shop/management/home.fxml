@@ -140,7 +140,6 @@
     </children>
 </AnchorPane>
 
-
             <AnchorPane fx:id="customers_form" prefHeight="600" prefWidth="650" visible="false">
                 <children>
                     <Label layoutX="20" layoutY="20" style="-fx-font-size: 30px;" text="Customers" />
