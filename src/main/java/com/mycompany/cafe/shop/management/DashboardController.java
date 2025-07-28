@@ -13,20 +13,20 @@ import java.util.ResourceBundle;
 
 public class DashboardController implements Initializable {
 
-    @FXML private Label productsCount, ordersCount, revenueLabel, couponsUsedCount, totalSavingsLabel;
-    
+    @FXML private Label productsCount, ordersCount, revenueLabel, couponsUsedCount, totalSavingsLabel, totalSellingLabel;
+
     // Recent Orders Table
     @FXML private TableView<OrderSummary> ordersTable;
     @FXML private TableColumn<OrderSummary, Integer> orderIdCol;
     @FXML private TableColumn<OrderSummary, String> orderUserCol, orderDateCol, orderStatusCol;
     @FXML private TableColumn<OrderSummary, Double> orderTotalCol;
-    
+
     // Coupon Orders Table
     @FXML private TableView<CouponOrderSummary> couponOrdersTable;
     @FXML private TableColumn<CouponOrderSummary, Integer> couponOrderIdCol, discountPercentCol;
     @FXML private TableColumn<CouponOrderSummary, String> couponUserCol, couponCodeCol, couponOrderDateCol;
     @FXML private TableColumn<CouponOrderSummary, Double> originalTotalCol, finalTotalCol, savingsCol;
-    
+
     // Low Stock Table
     @FXML private TableView<LowStockProduct> lowStockTable;
     @FXML private TableColumn<LowStockProduct, String> lsProductCol;
@@ -64,7 +64,7 @@ public class DashboardController implements Initializable {
         private final StringProperty orderDate = new SimpleStringProperty();
 
         public CouponOrderSummary(int orderId, String user, String couponCode, int discountPercent, 
-                                double originalTotal, double finalTotal, double savings, String orderDate) {
+                                  double originalTotal, double finalTotal, double savings, String orderDate) {
             this.orderId.set(orderId);
             this.user.set(user);
             this.couponCode.set(couponCode);
@@ -74,7 +74,6 @@ public class DashboardController implements Initializable {
             this.savings.set(savings);
             this.orderDate.set(orderDate);
         }
-        
         public IntegerProperty orderIdProperty() { return orderId; }
         public StringProperty userProperty() { return user; }
         public StringProperty couponCodeProperty() { return couponCode; }
@@ -138,15 +137,18 @@ public class DashboardController implements Initializable {
             rs = stmt.executeQuery("SELECT COUNT(*) AS count FROM orders");
             if (rs.next()) ordersCount.setText(String.valueOf(rs.getInt("count")));
 
-            // Total Revenue
+            // Total Revenue (with clean formatting)
             rs = stmt.executeQuery("SELECT SUM(total) AS revenue FROM orders");
-            if (rs.next()) revenueLabel.setText(String.format("$%.2f", rs.getDouble("revenue")));
+            if (rs.next()) {
+                java.math.BigDecimal revenue = rs.getBigDecimal("revenue");
+                revenueLabel.setText(formatMoney(revenue, 2)); // 2 decimals for revenue
+            }
 
             // Coupons Used Count
             rs = stmt.executeQuery("SELECT COUNT(*) AS count FROM coupons WHERE used = TRUE");
             if (rs.next()) couponsUsedCount.setText(String.valueOf(rs.getInt("count")));
 
-            // Total Savings from Coupons
+            // Total Savings from Coupons 
             rs = stmt.executeQuery(
                 "SELECT SUM((c.discount_percent / 100.0) * " +
                 "    (o.total / (1 - (c.discount_percent / 100.0)))) AS total_savings " +
@@ -155,8 +157,15 @@ public class DashboardController implements Initializable {
                 "WHERE c.used = TRUE"
             );
             if (rs.next()) {
-                double savings = rs.getDouble("total_savings");
-                totalSavingsLabel.setText(String.format("$%.2f", savings));
+                java.math.BigDecimal savings = rs.getBigDecimal("total_savings");
+                totalSavingsLabel.setText(formatMoney(savings, 1)); // 1 decimal for savings as requested
+            }
+
+            // Total Selling (with clean formatting)
+            rs = stmt.executeQuery("SELECT SUM(total) AS selling FROM orders");
+            if (rs.next()) {
+                java.math.BigDecimal selling = rs.getBigDecimal("selling");
+                totalSellingLabel.setText(formatMoney(selling, 2)); // 2 decimals for selling
             }
 
             // Recent Orders (last 10)
@@ -193,7 +202,7 @@ public class DashboardController implements Initializable {
             while (rs.next()) {
                 double originalTotal = rs.getDouble("original_total");
                 double finalTotal = rs.getDouble("total");
-                double savings = rs.getDouble("savings");
+                double savings = Math.round(rs.getDouble("savings") * 10.0) / 10.0; 
                 
                 couponOrders.add(new CouponOrderSummary(
                     rs.getInt("id"),
@@ -219,5 +228,19 @@ public class DashboardController implements Initializable {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    
+    // Add this public method to DashboardController
+public void refreshData() {
+    loadDashboardData(); 
+}
+
+    
+    // Updated helper method for money formatting (custom precision)
+    private String formatMoney(java.math.BigDecimal value, int decimalPlaces) {
+        if (value == null) return "$0.0";
+        value = value.setScale(decimalPlaces, java.math.RoundingMode.HALF_UP); 
+        return "$" + value.toPlainString(); 
     }
 }

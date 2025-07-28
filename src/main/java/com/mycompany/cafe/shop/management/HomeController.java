@@ -43,6 +43,9 @@ public class HomeController {
     // Track stock for limiting spinner
     private final Map<Integer, Integer> productStock = new HashMap<>();
 
+    private DashboardController dashboardController; 
+
+    
     // Coupon fields
     @FXML private TextField couponField;
     private double appliedDiscount = 0.0;
@@ -94,17 +97,22 @@ public class HomeController {
         customers_form.setVisible(false);
         switch (form) {
             case "dashboard":
-                if (!dashboardLoaded) {
-                    try {
-                        AnchorPane dashboardRoot = FXMLLoader.load(getClass().getResource("dashboard.fxml"));
-                        dashboard_form.getChildren().setAll(dashboardRoot);
-                        dashboardLoaded = true;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-                dashboard_form.setVisible(true);
-                break;
+                 if (!dashboardLoaded) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("dashboard.fxml"));
+            AnchorPane dashboardRoot = loader.load();
+            dashboardController = loader.getController(); // Get controller instance
+            dashboard_form.getChildren().setAll(dashboardRoot);
+            dashboardLoaded = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    if (dashboardController != null) {
+        dashboardController.refreshData(); // Refresh data every time shown
+    }
+    dashboard_form.setVisible(true);
+    break;
             case "inventory": inventory_form.setVisible(true); break;
             case "menu": menu_form.setVisible(true); break;
             case "customers":
@@ -241,67 +249,14 @@ public class HomeController {
     }
 
     @FXML private void clearCart() {
-        cartItems.clear();
-        updateCartDisplay();
+      cartItems.clear();
+    appliedDiscount = 0.0;
+    appliedCouponCode = null;
+    couponField.clear();
+    updateCartDisplay();
     }
 
-    @FXML private void payOrder() {
-        if (cartItems.isEmpty()) return;
-        String username = this.username.getText();
-        try (Connection conn = DBUtil.getConnection()) {
-            conn.setAutoCommit(false);
-            PreparedStatement psOrder = conn.prepareStatement(
-                "INSERT INTO orders (user, total) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS);
-            psOrder.setString(1, username);
-            psOrder.setDouble(2, cartTotal * (1 - appliedDiscount));
-            psOrder.executeUpdate();
-            int orderId = 0;
-            try (ResultSet rs = psOrder.getGeneratedKeys()) {
-                if (rs.next()) orderId = rs.getInt(1);
-            }
-            for (CartItem item : cartItems) {
-                PreparedStatement psItem = conn.prepareStatement(
-                    "INSERT INTO order_items (order_id,product_id,product_name,quantity,price) VALUES (?,?,?,?,?)");
-                psItem.setInt(1, orderId);
-                psItem.setInt(2, item.product.getId());
-                psItem.setString(3, item.product.getName());
-                psItem.setInt(4, item.quantity);
-                psItem.setDouble(5, item.product.getPrice());
-                psItem.executeUpdate();
-                PreparedStatement psStock = conn.prepareStatement(
-                    "UPDATE products SET stock = stock - ? WHERE id = ? AND stock >= ?");
-                psStock.setInt(1, item.quantity);
-                psStock.setInt(2, item.product.getId());
-                psStock.setInt(3, item.quantity);
-                int rows = psStock.executeUpdate();
-                if (rows == 0) throw new SQLException("Not enough stock for " + item.product.getName());
-            }
-            conn.commit();
-
-            // Mark coupon as used if applied
-            if (appliedCouponCode != null) {
-                PreparedStatement psUse = conn.prepareStatement("UPDATE coupons SET used = TRUE WHERE code = ?");
-                psUse.setString(1, appliedCouponCode);
-                psUse.executeUpdate();
-            }
-
-            // Generate new coupon
-            generateCouponForOrder(orderId, LoginController.currentUserId, 10); // 10% discount example
-
-            new Alert(Alert.AlertType.INFORMATION, "Order placed successfully!").showAndWait();
-            cartItems.clear();
-            appliedDiscount = 0.0;
-            appliedCouponCode = null;
-            couponField.clear();
-            updateCartDisplay();
-            loadMenuCards();
-            loadInventory();
-        } catch (Exception e) {
-            new Alert(Alert.AlertType.ERROR, "Order failed: "+e.getMessage()).showAndWait();
-        }
-    }
-
-    private void generateCouponForOrder(int orderId, int userId, int discountPercent) {
+  @FXML private void generateCouponForOrder(int orderId, int userId, int discountPercent) {
         String code = "CAFE" + discountPercent + "-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
         Timestamp expiresAt = new Timestamp(System.currentTimeMillis() + (30L * 24 * 60 * 60 * 1000)); // 30 days
 
@@ -320,28 +275,106 @@ public class HomeController {
         }
     }
 
-    @FXML private void applyCoupon() {
-        String code = couponField.getText().trim();
-        if (code.isEmpty()) return;
+@FXML private void applyCoupon() {
+    String code = couponField.getText().trim();
+    if (code.isEmpty()) return;
 
-        try (Connection conn = DBUtil.getConnection()) {
-            PreparedStatement ps = conn.prepareStatement(
-                "SELECT discount_percent FROM coupons WHERE code = ? AND used = FALSE AND expires_at > NOW() AND user_id = ?");
-            ps.setString(1, code);
-            ps.setInt(2, LoginController.currentUserId);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                appliedDiscount = rs.getInt("discount_percent") / 100.0;
-                appliedCouponCode = code;
-                updateCartDisplay();
-                new Alert(Alert.AlertType.INFORMATION, "Coupon applied!").show();
-            } else {
-                new Alert(Alert.AlertType.ERROR, "Invalid or expired coupon!").show();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+    try (Connection conn = DBUtil.getConnection()) {
+        PreparedStatement ps = conn.prepareStatement(
+            "SELECT discount_percent FROM coupons WHERE code = ? AND used = FALSE AND expires_at > NOW() AND user_id = ?");
+        ps.setString(1, code);
+        ps.setInt(2, LoginController.currentUserId);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            appliedDiscount = rs.getInt("discount_percent") / 100.0;
+            appliedCouponCode = code; // Ensure set
+            System.out.println("Coupon applied: " + code + " for user " + LoginController.currentUserId); // Debug log
+            updateCartDisplay();
+            new Alert(Alert.AlertType.INFORMATION, "Coupon applied!").show();
+        } else {
+            System.out.println("Invalid coupon attempt: " + code); // Debug log
+            new Alert(Alert.AlertType.ERROR, "Invalid or expired coupon!").show();
         }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        new Alert(Alert.AlertType.ERROR, "Error applying coupon: " + e.getMessage()).show();
     }
+}
+
+
+@FXML private void payOrder() {
+    if (cartItems.isEmpty()) return;
+    String username = this.username.getText();
+    try (Connection conn = DBUtil.getConnection()) {
+        conn.setAutoCommit(false);
+        // 1. Insert order
+        PreparedStatement psOrder = conn.prepareStatement(
+            "INSERT INTO orders (user, total) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS);
+        psOrder.setString(1, username);
+        psOrder.setDouble(2, cartTotal * (1 - appliedDiscount)); // Apply discount to saved total
+        psOrder.executeUpdate();
+        int orderId = 0;
+        try (ResultSet rs = psOrder.getGeneratedKeys()) {
+            if (rs.next()) orderId = rs.getInt(1);
+        }
+        // 2. Insert order items & update product stock
+        for (CartItem item : cartItems) {
+            PreparedStatement psItem = conn.prepareStatement(
+                "INSERT INTO order_items (order_id,product_id,product_name,quantity,price) VALUES (?,?,?,?,?)");
+            psItem.setInt(1, orderId);
+            psItem.setInt(2, item.product.getId());
+            psItem.setString(3, item.product.getName());
+            psItem.setInt(4, item.quantity);
+            psItem.setDouble(5, item.product.getPrice());
+            psItem.executeUpdate();
+            PreparedStatement psStock = conn.prepareStatement(
+                "UPDATE products SET stock = stock - ? WHERE id = ? AND stock >= ?");
+            psStock.setInt(1, item.quantity);
+            psStock.setInt(2, item.product.getId());
+            psStock.setInt(3, item.quantity);
+            int rows = psStock.executeUpdate();
+            if (rows == 0) throw new SQLException("Not enough stock for " + item.product.getName());
+        }
+
+        // Mark coupon as used if applied (before commit for safety)
+        if (appliedCouponCode != null) {
+            System.out.println("Attempting to mark coupon " + appliedCouponCode + " as used for user " + LoginController.currentUserId);
+            PreparedStatement psUse = conn.prepareStatement("UPDATE coupons SET used = TRUE WHERE code = ? AND user_id = ?");
+            psUse.setString(1, appliedCouponCode);
+            psUse.setInt(2, LoginController.currentUserId);
+            int rowsUpdated = psUse.executeUpdate();
+            if (rowsUpdated > 0) {
+                System.out.println("Success: Coupon " + appliedCouponCode + " marked as used.");
+            } else {
+                System.out.println("Failure: No rows updated for coupon " + appliedCouponCode + ". Check code/user_id.");
+                new Alert(Alert.AlertType.WARNING, "Coupon applied but status not updated in DB. Check console.").show();
+            }
+        } else {
+            System.out.println("No coupon applied for this order.");
+        }
+
+        conn.commit();
+
+        // Generate new coupon
+        generateCouponForOrder(orderId, LoginController.currentUserId, 10); // 10% discount example
+
+        new Alert(Alert.AlertType.INFORMATION, "Order placed successfully!").showAndWait();
+        cartItems.clear();
+        appliedDiscount = 0.0;
+        appliedCouponCode = null;
+        couponField.clear();
+        updateCartDisplay();
+        loadMenuCards();
+        loadInventory();
+        if (dashboardController != null && dashboard_form.isVisible()) {
+    dashboardController.refreshData(); 
+}
+    } catch (Exception e) {
+        new Alert(Alert.AlertType.ERROR, "Order failed: " + e.getMessage()).showAndWait();
+        e.printStackTrace();
+     
+    }
+}
 
     private void updateCartDisplay() {
         cartBox.getChildren().clear();

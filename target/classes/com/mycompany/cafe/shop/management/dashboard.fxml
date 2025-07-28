@@ -9,29 +9,33 @@
 
     <VBox spacing="18" AnchorPane.leftAnchor="18" AnchorPane.rightAnchor="18" AnchorPane.topAnchor="18">
 
-        <!-- Metrics Cards -->
-        <HBox spacing="30">
-            <VBox style="-fx-background-color: white; -fx-border-radius:7; -fx-background-radius:7; -fx-padding:14; -fx-effect:dropshadow(two-pass-box,#222,2,0.07,0,2);" alignment="CENTER">
-                <Label text="Products" style="-fx-font-size:14;"/>
-                <Label fx:id="productsCount" text="0" style="-fx-font-size:36; -fx-font-weight:bold;"/>
-            </VBox>
-            <VBox style="-fx-background-color: white; -fx-border-radius:7; -fx-background-radius:7; -fx-padding:14; -fx-effect:dropshadow(two-pass-box,#222,2,0.07,0,2);" alignment="CENTER">
-                <Label text="Total Orders" style="-fx-font-size:14;"/>
-                <Label fx:id="ordersCount" text="0" style="-fx-font-size:36; -fx-font-weight:bold;"/>
-            </VBox>
-            <VBox style="-fx-background-color: white; -fx-border-radius:7; -fx-background-radius:7; -fx-padding:14; -fx-effect:dropshadow(two-pass-box,#222,2,0.07,0,2);" alignment="CENTER">
-                <Label text="Total Revenue" style="-fx-font-size:14;"/>
-                <Label fx:id="revenueLabel" text="\$0.0" style="-fx-font-size:36; -fx-font-weight:bold;"/>
-            </VBox>
-            <VBox style="-fx-background-color: white; -fx-border-radius:7; -fx-background-radius:7; -fx-padding:14; -fx-effect:dropshadow(two-pass-box,#222,2,0.07,0,2);" alignment="CENTER">
-                <Label text="Coupons Used" style="-fx-font-size:14;"/>
-                <Label fx:id="couponsUsedCount" text="0" style="-fx-font-size:36; -fx-font-weight:bold;"/>
-            </VBox>
-            <VBox style="-fx-background-color: white; -fx-border-radius:7; -fx-background-radius:7; -fx-padding:14; -fx-effect:dropshadow(two-pass-box,#222,2,0.07,0,2);" alignment="CENTER">
-                <Label text="Total Savings" style="-fx-font-size:14;"/>
-                <Label fx:id="totalSavingsLabel" text="\$0.0" style="-fx-font-size:36; -fx-font-weight:bold;"/>
-            </VBox>
-        </HBox>
+    <!-- Metrics Cards -->
+<HBox spacing="20" alignment="CENTER" style="-fx-padding: 10 0 10 0;">
+    <VBox prefWidth="150" style="-fx-background-color: white; -fx-border-radius:7; -fx-background-radius:7; -fx-padding:16; -fx-effect:dropshadow(two-pass-box,#222,2,0.07,0,2);" alignment="CENTER">
+        <Label text="Products" style="-fx-font-size:14;"/>
+        <Label fx:id="productsCount" text="0" wrapText="true" style="-fx-font-size:36; -fx-font-weight:bold; -fx-text-alignment: center;"/>
+    </VBox>
+    <VBox prefWidth="150" style="-fx-background-color: white; -fx-border-radius:7; -fx-background-radius:7; -fx-padding:16; -fx-effect:dropshadow(two-pass-box,#222,2,0.07,0,2);" alignment="CENTER">
+        <Label text="Total Orders" style="-fx-font-size:14;"/>
+        <Label fx:id="ordersCount" text="0" wrapText="true" style="-fx-font-size:36; -fx-font-weight:bold; -fx-text-alignment: center;"/>
+    </VBox>
+    <VBox prefWidth="150" style="-fx-background-color: white; -fx-border-radius:7; -fx-background-radius:7; -fx-padding:16; -fx-effect:dropshadow(two-pass-box,#222,2,0.07,0,2);" alignment="CENTER">
+        <Label text="Total Revenue" style="-fx-font-size:14;"/>
+        <Label fx:id="revenueLabel" text="\$0.0" wrapText="true" style="-fx-font-size:25; -fx-font-weight:bold; -fx-text-alignment: center;"/>
+    </VBox>
+    <VBox prefWidth="150" style="-fx-background-color: white; -fx-border-radius:7; -fx-background-radius:7; -fx-padding:16; -fx-effect:dropshadow(two-pass-box,#222,2,0.07,0,2);" alignment="CENTER">
+        <Label text="Coupons Used" style="-fx-font-size:14;"/>
+        <Label fx:id="couponsUsedCount" text="0" wrapText="true" style="-fx-font-size:36; -fx-font-weight:bold; -fx-text-alignment: center;"/>
+    </VBox>
+    <VBox prefWidth="150" style="-fx-background-color: white; -fx-border-radius:7; -fx-background-radius:7; -fx-padding:16; -fx-effect:dropshadow(two-pass-box,#222,2,0.07,0,2);" alignment="CENTER">
+        <Label text="Total Savings" style="-fx-font-size:14;"/>
+        <Label fx:id="totalSavingsLabel" text="\$0.0" wrapText="true" style="-fx-font-size:25; -fx-font-weight:bold; -fx-text-alignment: center;"/>
+    </VBox>
+    <VBox prefWidth="150" style="-fx-background-color: white; -fx-border-radius:7; -fx-background-radius:7; -fx-padding:16; -fx-effect:dropshadow(two-pass-box,#222,2,0.07,0,2);" alignment="CENTER">
+        <Label text="Total Selling" style="-fx-font-size:14;"/>
+        <Label fx:id="totalSellingLabel" text="\$0.0" wrapText="true" style="-fx-font-size:25; -fx-font-weight:bold; -fx-text-alignment: center;"/>
+    </VBox>
+</HBox>
 
         <!-- Orders with Coupons Applied -->
         <Label text="Orders with Coupon Discounts:" style="-fx-font-size:18; -fx-padding:12 0 0 0;"/>
