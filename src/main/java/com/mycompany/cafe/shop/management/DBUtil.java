@@ -54,12 +54,12 @@ public class DBUtil {
     String couponsTable =
     "CREATE TABLE IF NOT EXISTS coupons (" +
     "id INT AUTO_INCREMENT PRIMARY KEY," +
-    "code VARCHAR(50) UNIQUE," +  // Unique coupon code, e.g., "CAFE10-XYZ123"
-    "user_id INT," +             // Links to users.id
-    "order_id INT," +            // Links to orders.id (the order that generated it)
-    "discount_percent INT," +    // e.g., 10 for 10%
+    "code VARCHAR(50) UNIQUE," +    // generate Unique coupon code, like:, "CAFE10-XYZ123"
+    "user_id INT," +             
+    "order_id INT," +            
+    "discount_percent INT," +    
     "created_at DATETIME DEFAULT CURRENT_TIMESTAMP," +
-    "expires_at DATETIME," +     // e.g., 30 days from creation
+    "expires_at DATETIME," +     
     "used BOOLEAN DEFAULT FALSE," +
     "FOREIGN KEY (user_id) REFERENCES users(id)," +
     "FOREIGN KEY (order_id) REFERENCES orders(id)" +

@@ -15,6 +15,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import java.util.UUID;
 
 public class HomeController {
     @FXML private Label username;
@@ -38,11 +39,16 @@ public class HomeController {
    @FXML private Label cartTotalLabel;
    @FXML private Button payBtn, clearCartBtn;
    private final ObservableList<CartItem> cartItems = FXCollections.observableArrayList();
-private double cartTotal = 0.0;
+   double cartTotal = 0.0;
 // Track stock for limiting spinner
-private final Map<Integer, Integer> productStock = new HashMap<>();
-
+   private final Map<Integer, Integer> productStock = new HashMap<>();
+ 
+  // Coupon field
    
+  @FXML private TextField couponField;
+    private double appliedDiscount = 0.0;
+    private String appliedCouponCode = null; // To track code for marking as used
+
 
     @FXML
     public void initialize() {
@@ -254,7 +260,7 @@ private void loadInventory() {
         PreparedStatement psOrder = conn.prepareStatement(
             "INSERT INTO orders (user, total) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS);
         psOrder.setString(1, username);
-        psOrder.setDouble(2, cartTotal);
+        psOrder.setDouble(2, cartTotal * (1 - appliedDiscount)); // Apply discount to saved total
         psOrder.executeUpdate();
         int orderId = 0;
         try (ResultSet rs = psOrder.getGeneratedKeys()) {
@@ -281,8 +287,26 @@ private void loadInventory() {
             if (rows == 0) throw new SQLException("Not enough stock for " + item.product.getName());
         }
         conn.commit();
+        
+         // Mark coupon as used if one was applied
+         
+          if (appliedCouponCode != null) {
+                PreparedStatement psUseCoupon = conn.prepareStatement("UPDATE coupons SET used = TRUE WHERE code = ?");
+                psUseCoupon.setString(1, appliedCouponCode);
+                psUseCoupon.executeUpdate();
+            }
+          
+          
+           // Generate new coupon for this order
+            generateCouponForOrder(orderId, LoginController.currentUserName, 10); // e.g., 10% discount
+        
+        
+        
         new Alert(Alert.AlertType.INFORMATION, "Order placed successfully!").showAndWait();
         cartItems.clear();
+        appliedDiscount = 0.0;
+         appliedCouponCode = null;
+          couponField.clear();
         updateCartDisplay();
         loadMenuCards();
         loadInventory(); // Update inventory if open
@@ -291,8 +315,52 @@ private void loadInventory() {
     }
 }
 
+      //  method to generate coupon
+    private void generateCouponForOrder(int orderId, int userId, int discountPercent) {
+        String code = "CAFE" + discountPercent + "-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+        Timestamp expiresAt = new Timestamp(System.currentTimeMillis() + (30L * 24 * 60 * 60 * 1000)); // 30 days
+
+        try (Connection conn = DBUtil.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement(
+                "INSERT INTO coupons (code, user_id, order_id, discount_percent, expires_at) VALUES (?, ?, ?, ?, ?)");
+            ps.setString(1, code);
+            ps.setInt(2, userId);
+            ps.setInt(3, orderId);
+            ps.setInt(4, discountPercent);
+            ps.setTimestamp(5, expiresAt);
+            ps.executeUpdate();
+            new Alert(Alert.AlertType.INFORMATION, "Coupon generated: " + code + " for " + discountPercent + "% off!").show(); // Show to user
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
     
     
+     // New method to apply coupon
+    @FXML private void applyCoupon() {
+        String code = couponField.getText().trim();
+        if (code.isEmpty()) return;
+
+        try (Connection conn = DBUtil.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement(
+                "SELECT discount_percent FROM coupons WHERE code = ? AND used = FALSE AND expires_at > NOW() AND user_id = ?");
+            ps.setString(1, code);
+            ps.setInt(2, LoginController.currentUserId); // Assume you have currentUserId from login
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                appliedDiscount = rs.getInt("discount_percent") / 100.0;
+                appliedCouponCode = code;
+                updateCartDisplay();
+                new Alert(Alert.AlertType.INFORMATION, "Coupon applied!").show();
+            } else {
+                new Alert(Alert.AlertType.ERROR, "Invalid or expired coupon!").show();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+      // Updated updateCartDisplay with discount
     
     private void updateCartDisplay() {
     cartBox.getChildren().clear();
@@ -313,6 +381,12 @@ private void loadInventory() {
         cartBox.getChildren().add(line);
         cartTotal += item.getSubtotal();
     }
+    
+        double finalTotal = cartTotal * (1 - appliedDiscount);
+        cartTotalLabel.setText(String.format("$%.2f", finalTotal));
+        payBtn.setDisable(cartItems.isEmpty());
+        clearCartBtn.setDisable(cartItems.isEmpty());
+    
     cartTotalLabel.setText(String.format("$%.2f", cartTotal));
     payBtn.setDisable(cartItems.isEmpty());
     clearCartBtn.setDisable(cartItems.isEmpty());
