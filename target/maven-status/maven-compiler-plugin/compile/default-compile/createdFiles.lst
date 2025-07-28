@@ -1,6 +1,7 @@
 com\mycompany\cafe\shop\management\Card_formController.class
 com\mycompany\cafe\shop\management\HomeController$CartItem.class
 com\mycompany\cafe\shop\management\CustomersController.class
+com\mycompany\cafe\shop\management\DashboardController$LowStockProduct.class
 com\mycompany\cafe\shop\management\HomeController.class
 com\mycompany\cafe\shop\management\CustomersController$CustomerSummary.class
 com\mycompany\cafe\shop\management\Customer.class
@@ -9,5 +10,6 @@ com\mycompany\cafe\shop\management\SignupController.class
 module-info.class
 com\mycompany\cafe\shop\management\DBUtil.class
 com\mycompany\cafe\shop\management\CafeShopMain.class
+com\mycompany\cafe\shop\management\DashboardController$OrderSummary.class
 com\mycompany\cafe\shop\management\DashboardController.class
 com\mycompany\cafe\shop\management\Product.class
