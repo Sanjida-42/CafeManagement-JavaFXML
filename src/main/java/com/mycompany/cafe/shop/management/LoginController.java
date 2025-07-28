@@ -1,7 +1,9 @@
 package com.mycompany.cafe.shop.management;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 
 import java.io.IOException;
@@ -10,7 +12,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 public class LoginController {
-     public static String currentUserName = null; 
+    public static String currentUserName = null;
+    public static int currentUserId = -1; // New: Track user ID for coupons/user-specific features
+
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
     @FXML private Text signUpLink;
@@ -44,13 +48,14 @@ public class LoginController {
             ps.setString(2, password);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
+                currentUserId = rs.getInt("id"); // New: Set user ID
                 currentUserName = rs.getString("name");
                 CafeShopMain.setRoot("home");
             } else {
                 alert("Login Failed", "Invalid email or password.", Alert.AlertType.ERROR);
             }
         } catch (Exception e) {
-             e.printStackTrace();
+            e.printStackTrace();
             alert("Database Error", e.getMessage(), Alert.AlertType.ERROR);
         }
     }
